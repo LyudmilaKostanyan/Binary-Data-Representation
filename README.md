@@ -75,7 +75,7 @@ a ^= b;
 
 * Modern CPUs are highly optimized for **load/store (`mov`) instructions** used in `swapWithTemp`.
 * XOR-based swap involves **dependent bitwise operations** that can't be easily parallelized by the CPU pipeline.
-* `swapWithXOR` also requires an extra check (`if (&a == &b)`) to avoid corrupting data when both references point to the same variable.
+* `swapWithXOR` also requires an extra check (`if (a == b)`).
 * Compilers may inline and optimize `swapWithTemp` very efficiently; XOR swap cannot be optimized as well due to data dependency.
 
 ---
@@ -111,7 +111,7 @@ a ^= b;
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/username/Binary-Data-Representation.git
+git clone https://github.com/LyudmilaKostanyan/Binary-Data-Representation.git
 cd Binary-Data-Representation
 ```
 
