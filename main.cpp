@@ -1,14 +1,16 @@
 #include <iostream>
 #include <cassert>
+#include <csignal>
+#include <cstdlib>
 #include "kaizen.h"
 
 bool isPowerOfTwo(unsigned int x) {
-	return x != 0 && (x & (x - 1)) == 0;
+	return (x != 0 && (x & (x - 1)) == 0);
 }
 
 bool isLittleEndian() {
 	uint16_t number = 1;
-	return *(uint8_t*)&number == 1;
+	return (*(uint8_t*)&number == 1);
 }
 
 void swapWithTemp(int& a, int& b) {
@@ -86,19 +88,31 @@ void testSwapTime() {
 
 	std::cout << "[Info] Swap with temp took: " << tempDuration.count() << " ns\n";
 	std::cout << "[Info] Swap with XOR  took: " << xorDuration.count() << " ns\n";
-	std::cout << "[Info] Swap with temp is " << (tempDuration < xorDuration ? "faster" : "slower") << " than swap with XOR.\n";
+	std::cout << "[Info] Swap with temp is " << (tempDuration < xorDuration ? "faster" : "slower") << " than swap with XOR.\n\n";
 }
 
-void runAllTests() {
+void segfaultHandler(int signum) {
+	std::cout << "[OK] Caught segmentation fault (signal " << signum << ").\n\n";
+	std::exit(0);
+}
+
+void testSegfault() {
+	std::signal(SIGSEGV, segfaultHandler);
+
+	std::cout << "[Test] testSegfault started...\n";
+	std::cout << "[Info] Intentionally dereferencing invalid pointer 0xBAADF00D\n";
+
+	unsigned int* ptr = reinterpret_cast<unsigned int*>(0xBAADF00D);
+	int value = *ptr;
+	(void)value;
+}
+
+int main() {
 	testIsPowerOfTwo();
 	testIsLittleEndian();
 	testSwapWithTemp();
 	testSwapWithXOR();
 	testSwapTime();
-}
-
-int main() {
-	runAllTests();
+	testSegfault();
 	return 0;
 }
-
