@@ -2,12 +2,14 @@
 
 ## Overview
 
-This project demonstrates several low-level programming concepts in C++ related to binary data representation and performance benchmarking. Specifically, it includes:
+This project demonstrates several low-level programming concepts in C++ related to binary data representation, performance benchmarking, memory layout, and binary file format parsing. Specifically, it includes:
 
 * Detection of powers of two using bitwise logic
 * Runtime detection of system endianness
 * Two implementations of value swapping (using a temporary variable and using XOR)
 * Performance comparison of the two swap methods using a timing utility
+* Manual simulation and handling of a segmentation fault
+* Binary parsing of a PNG image header based on known byte structure
 
 ---
 
@@ -18,7 +20,8 @@ This project explores:
 * **How to identify if an integer is a power of two**
 * **How to detect the byte order (endianness) of the current machine**
 * **How different implementations of swap behave in performance**
-* **How bitwise operations differ from arithmetic operations in practice**
+* **How to catch and log segmentation faults at runtime**
+* **How to read and interpret binary fields in structured file formats (like PNG)**
 
 ---
 
@@ -80,6 +83,27 @@ a ^= b;
 
 ---
 
+### Debugging with Hex Values (Segmentation Fault Simulation)
+
+The program includes a function that deliberately triggers a segmentation fault by dereferencing a bogus pointer (e.g., `0xBAADF00D`). A custom signal handler is registered for `SIGSEGV` to capture the fault and print a controlled message before exiting.
+
+This allows simulation and controlled response to memory access violations without crashing the system blindly.
+
+---
+
+### PNG Header Parsing
+
+The program parses the first bytes of a PNG file to extract the following from the IHDR chunk:
+
+* Width and height in pixels
+* Bit depth
+* Color type
+* Compression, filter, and interlace methods
+
+All values are read in **big-endian** order, as defined in the PNG specification.
+
+---
+
 ## Example Output
 
 ```
@@ -91,18 +115,36 @@ a ^= b;
 
 [OK] swapWithXOR passed all tests.
 
-[Info] Swap with temp took: 192.83 ms
-[Info] Swap with XOR  took: 305.14 ms
-[Info] Swap with temp is faster than swap with XOR.
+[Info] Swap with temp took: 42 ns
+[Info] Swap with XOR  took: 0 ns
+[Info] Swap with temp is slower than swap with XOR.
+
+[Test] parsePNGHeader started...
+[OK] PNG signature verified.
+[OK] IHDR chunk parsed.
+ - Width:        764 px
+ - Height:       910 px
+ - Bit Depth:    8
+ - Color Type:   6
+ - Compression:  0
+ - Filter:       0
+ - Interlace:    0
+[OK] parsePNGHeader completed.
+
+[Test] testSegfault started...
+[Info] Intentionally dereferencing invalid pointer 0xBAADF00D
+[OK] Caught segmentation fault (signal 11).
 ```
 
 ---
 
 ## Explanation of Output
 
-* All logical functions are tested with `assert` to ensure correctness.
-* System endianness is detected and printed.
-* Timings for 100 million swaps show that using a temporary variable is consistently faster than using XOR.
+* All logic functions are tested using `assert`.
+* Platform endianness is reported at runtime.
+* Performance comparison is done for 100M swaps.
+* Segmentation fault is triggered and safely logged.
+* PNG metadata is extracted using binary field parsing.
 
 ---
 

@@ -1,3 +1,4 @@
+#pragma once
 #include <fstream>
 #include <iostream>
 
@@ -90,5 +91,4 @@ namespace bin {
 		std::cout << "[OK] Caught segmentation fault (signal " << signum << ").\n\n";
 		std::exit(0);
 	}
-	
 }
